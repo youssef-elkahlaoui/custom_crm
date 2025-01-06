@@ -60,7 +60,6 @@
                 <field name="user_id"/>
                 <field name="team_id"/>
                 <field name="date_deadline"/>
-                <field name="create_date"/>
                 <templates>
                     <t t-name="kanban-box">
                         <div class="oe_kanban_global_click container">
@@ -102,11 +101,11 @@
         </field>
     </record>
 
-    <!-- Client Portal Dashboard -->
-    <record id="view_client_dashboard_kanban" model="ir.ui.view">
-        <field name="name">custom.crm.client.dashboard.kanban</field>
+    <!-- Portal User Dashboard -->
+    <record id="view_portal_dashboard_kanban" model="ir.ui.view">
+        <field name="name">custom.crm.portal.dashboard.kanban</field>
         <field name="model">crm.lead</field>
-        <field name="groups_id" eval="[(4, ref('custom_crm.group_custom_crm_client'))]"/>
+        <field name="groups_id" eval="[(4, ref('base.group_portal'))]"/>
         <field name="arch" type="xml">
             <kanban class="oe_background_grey o_kanban_dashboard" create="0">
                 <field name="name"/>
@@ -142,51 +141,14 @@
         </field>
     </record>
 
-    <!-- Dashboard Actions -->
-    <record id="action_salesperson_dashboard" model="ir.actions.act_window">
-        <field name="name">My Sales Dashboard</field>
-        <field name="res_model">crm.lead</field>
-        <field name="view_mode">kanban,form</field>
-        <field name="domain">[('user_id', '=', uid)]</field>
-        <field name="context">{'group_by': 'stage_id'}</field>
-        <field name="view_id" ref="view_salesperson_dashboard_kanban"/>
-    </record>
-
-    <record id="action_manager_dashboard" model="ir.actions.act_window">
-        <field name="name">Sales Team Dashboard</field>
-        <field name="res_model">crm.lead</field>
-        <field name="view_mode">kanban,form</field>
-        <field name="context">{'group_by': ['team_id', 'stage_id']}</field>
-        <field name="view_id" ref="view_manager_dashboard_kanban"/>
-    </record>
-
-    <record id="action_client_dashboard" model="ir.actions.act_window">
+    <!-- Actions -->
+    <record id="action_my_opportunities" model="ir.actions.act_window">
         <field name="name">My Opportunities</field>
         <field name="res_model">crm.lead</field>
         <field name="view_mode">kanban,form</field>
         <field name="domain">[('partner_id.user_ids', 'in', uid)]</field>
-        <field name="view_id" ref="view_client_dashboard_kanban"/>
+        <field name="context">{'default_type': 'opportunity'}</field>
+        <field name="view_id" ref="view_portal_dashboard_kanban"/>
     </record>
 
-    <!-- Menu Items -->
-    <menuitem id="menu_salesperson_dashboard"
-        name="My Dashboard"
-        parent="crm.crm_menu_root"
-        action="action_salesperson_dashboard"
-        sequence="1"
-        groups="custom_crm.group_custom_crm_salesperson"/>
-
-    <menuitem id="menu_manager_dashboard"
-        name="Team Dashboard"
-        parent="crm.crm_menu_root"
-        action="action_manager_dashboard"
-        sequence="1"
-        groups="custom_crm.group_custom_crm_manager"/>
-
-    <menuitem id="menu_client_dashboard"
-        name="My Opportunities"
-        parent="crm.crm_menu_root"
-        action="action_client_dashboard"
-        sequence="1"
-        groups="custom_crm.group_custom_crm_client"/>
 </odoo>

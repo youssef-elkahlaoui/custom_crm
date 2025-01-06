@@ -1,29 +1,28 @@
 {
-    'name': 'CRM Avancé',
+    'name': 'Custom CRM',
     'version': '1.0',
     'category': 'Sales/CRM',
-    'summary': 'Fonctionnalités avancées pour la gestion des opportunités',
+    'summary': 'Custom CRM features with client portal',
     'description': """
-        Module CRM personnalisé avec:
-        - Tableaux de bord personnalisés par rôle
-        - Gestion des accès et sécurité
-        - Vue portail client
+        Custom CRM module with enhanced features:
+        * Client portal access to opportunities
+        * Custom dashboards for different user roles
+        * Enhanced opportunity management
     """,
     'depends': [
         'base',
         'crm',
-        'mail',
         'portal',
+        'website',
         'sales_team',
-        'contacts',
     ],
     'data': [
         'security/crm_security.xml',
         'security/ir.model.access.csv',
         'views/dashboard_views.xml',
-        'wizards/crm_lost_reason_views.xml',
+        'views/portal_templates.xml',
     ],
-    'application': True,
     'installable': True,
+    'application': True,
     'auto_install': False,
 }

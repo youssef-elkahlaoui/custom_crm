@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="portal_my_home_menu_opportunities" name="Portal Menu Opportunities" inherit_id="portal.portal_breadcrumbs" priority="20">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'opportunities'" class="breadcrumb-item">Opportunities</li>
+        </xpath>
+    </template>
+
+    <template id="portal_my_opportunities" name="My Opportunities">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Opportunities</t>
+            </t>
+            <t t-if="not opportunities">
+                <div class="alert alert-warning mt8" role="alert">
+                    There are no opportunities.
+                </div>
+            </t>
+            <t t-if="opportunities" t-call="portal.portal_table">
+                <thead>
+                    <tr>
+                        <th>Opportunity</th>
+                        <th>Stage</th>
+                        <th>Contact Person</th>
+                        <th>Expected Completion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="opportunities" t-as="opportunity">
+                        <tr>
+                            <td><span t-field="opportunity.name"/></td>
+                            <td><span t-field="opportunity.stage_id"/></td>
+                            <td><span t-field="opportunity.user_id"/></td>
+                            <td><span t-field="opportunity.date_deadline"/></td>
+                        </tr>
+                    </t>
+                </tbody>
+            </t>
+        </t>
+    </template>
+</odoo>
