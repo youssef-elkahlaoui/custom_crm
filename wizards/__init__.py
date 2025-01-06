@@ -1,1 +1,1 @@
-from . import lost_reason_wizard
+from . import crm_lost_reason_wizard
