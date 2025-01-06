@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Graph View for Lost Opportunity Analysis -->
+        <record id="view_crm_opportunity_lost_graph" model="ir.ui.view">
+            <field name="name">crm.lead.lost.graph</field>
+            <field name="model">crm.lead</field>
+            <field name="arch" type="xml">
+                <graph string="Analyse des opportunités perdues" type="bar">
+                    <field name="lost_reason_detailed"/>
+                    <field name="id" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <!-- Action for Lost Opportunity Analysis -->
+        <record id="action_opportunity_lost_analysis" model="ir.actions.act_window">
+            <field name="name">Analyse des opportunités perdues</field>
+            <field name="res_model">crm.lead</field>
+            <field name="view_mode">graph</field>
+            <field name="domain">[('type', '=', 'opportunity'), ('active', '=', False), ('lost_reason_detailed', '!=', False)]</field>
+            <field name="context">{'group_by': 'lost_reason_detailed'}</field>
+            <field name="view_id" ref="view_crm_opportunity_lost_graph"/>
+        </record>
+
+        <!-- Menu item for Lost Opportunity Analysis -->
+        <menuitem id="menu_opportunity_lost_analysis"
+                  name="Analyse des pertes"
+                  parent="crm.crm_menu_report"
+                  action="action_opportunity_lost_analysis"
+                  sequence="20"/>
+    </data>
+</odoo>

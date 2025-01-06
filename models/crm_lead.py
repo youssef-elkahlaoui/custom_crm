@@ -17,9 +17,17 @@ class CrmLead(models.Model):
     lost_reason_detailed = fields.Selection([
         ('price', 'Prix trop élevé'),
         ('communication', 'Manque de communication'),
-        ('product', 'Produit inadapté')
+        ('product', 'Produit inadapté'),
+        ('competition', 'Concurrence'),
+        ('timing', 'Mauvais timing'),
+        ('features', 'Fonctionnalités manquantes'),
+        ('other', 'Autre')
     ], string='Raison détaillée de la perte')
     lost_price_difference = fields.Float('Différence de prix (%)')
+    archive_date = fields.Datetime('Date d\'archivage')
+    reminder_count = fields.Integer('Nombre de rappels', default=0)
+    last_reminder_sent = fields.Datetime('Dernier rappel envoyé')
+    requires_manager_attention = fields.Boolean('Attention manager requise', default=False)
 
     @api.depends('last_followup_date')
     def _compute_next_followup(self):
@@ -62,3 +70,93 @@ class CrmLead(models.Model):
         for lead in self:
             template.send_mail(lead.id, force_send=True)
         return res
+
+    def notify_sales_person(self):
+        """Send reminder to sales person"""
+        if self.user_id:
+            self.env['mail.message'].create({
+                'model': 'crm.lead',
+                'res_id': self.id,
+                'message_type': 'notification',
+                'partner_ids': [(4, self.user_id.partner_id.id)],
+                'subject': 'Rappel: Suivi d\'opportunité nécessaire',
+                'body': f'L\'opportunité {self.name} nécessite votre attention.'
+            })
+            self.reminder_count += 1
+            self.last_reminder_sent = fields.Datetime.now()
+
+    def notify_manager(self):
+        """Notify manager for won opportunities"""
+        if self.team_id and self.team_id.user_id:
+            self.env['mail.message'].create({
+                'model': 'crm.lead',
+                'res_id': self.id,
+                'message_type': 'notification',
+                'partner_ids': [(4, self.team_id.user_id.partner_id.id)],
+                'subject': 'Nouvelle opportunité gagnée',
+                'body': f'L\'opportunité {self.name} a été gagnée. Veuillez créer un bon de commande.'
+            })
+            self.requires_manager_attention = True
+
+    @api.model
+    def _cron_auto_archive_opportunities(self):
+        """Auto archive opportunities after 30 days without feedback"""
+        deadline = fields.Datetime.now() - timedelta(days=30)
+        opportunities = self.search([
+            ('type', '=', 'opportunity'),
+            ('feedback_submitted', '=', False),
+            ('create_date', '<', deadline),
+            ('active', '=', True)
+        ])
+        for opp in opportunities:
+            opp.write({
+                'active': False,
+                'archive_date': fields.Datetime.now()
+            })
+            # Send final notification
+            opp.notify_sales_person()
+            if opp.partner_id and opp.partner_id.email:
+                template = self.env.ref('custom_crm.email_template_opportunity_archived')
+                template.send_mail(opp.id)
+
+    @api.model
+    def _cron_send_reminders(self):
+        """Send reminders at different intervals"""
+        intervals = [
+            (1, 'Rappel 24h'),
+            (2, 'Rappel 48h'),
+            (3, 'Rappel 72h'),
+            (7, 'Rappel 1 semaine')
+        ]
+        
+        for days, reminder_type in intervals:
+            deadline = fields.Datetime.now() - timedelta(days=days)
+            opportunities = self.search([
+                ('type', '=', 'opportunity'),
+                ('feedback_submitted', '=', False),
+                ('create_date', '<', deadline),
+                ('reminder_count', '=', days - 1)
+            ])
+            for opp in opportunities:
+                opp.notify_sales_person()
+
+    def action_set_won(self):
+        """Override to add manager notification"""
+        res = super(CrmLead, self).action_set_won()
+        self.notify_manager()
+        return res
+
+    def get_opportunity_analytics(self):
+        """Get analytics for lost opportunities"""
+        domain = [
+            ('type', '=', 'opportunity'),
+            ('stage_id.is_won', '=', False),
+            ('lost_reason_detailed', '!=', False)
+        ]
+        opportunities = self.search(domain)
+        
+        analytics = {}
+        for reason in dict(self._fields['lost_reason_detailed'].selection):
+            analytics[reason] = len(opportunities.filtered(lambda o: o.lost_reason_detailed == reason))
+        
+        return analytics
