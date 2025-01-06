@@ -25,7 +25,7 @@
         'sales_team'
     ],
     'data': [
-        'security/security.xml',
+        'security/crm_security.xml',
         'security/ir.model.access.csv',
         'views/feedback_views.xml',
         'views/res_partner_views.xml',

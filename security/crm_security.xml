@@ -1,40 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Security Groups -->
-    <record id="group_crm_salesperson" model="res.groups">
-        <field name="name">CRM / Sales Person</field>
-        <field name="category_id" ref="base.module_category_sales_sales"/>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-        <field name="comment">Sales person can create opportunities and manage their own leads</field>
-    </record>
+    <data noupdate="0">
+        <!-- Groupe Vendeur (Salesperson) -->
+        <record id="group_custom_crm_salesperson" model="res.groups">
+            <field name="name">CRM Avancé / Vendeur</field>
+            <field name="category_id" ref="base.module_category_sales_sales"/>
+            <field name="implied_ids" eval="[
+                (4, ref('base.group_user')),
+                (4, ref('sales_team.group_sale_salesman')),
+                (4, ref('stock.group_stock_user'))
+            ]"/>
+            <field name="comment">Vendeur avec accès aux opportunités et clients</field>
+        </record>
 
-    <record id="group_crm_manager" model="res.groups">
-        <field name="name">CRM / Sales Manager</field>
-        <field name="category_id" ref="base.module_category_sales_sales"/>
-        <field name="implied_ids" eval="[(4, ref('group_crm_salesperson'))]"/>
-        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
-        <field name="comment">Sales manager can approve opportunities and create sales orders</field>
-    </record>
+        <!-- Groupe Manager -->
+        <record id="group_custom_crm_manager" model="res.groups">
+            <field name="name">CRM Avancé / Manager</field>
+            <field name="category_id" ref="base.module_category_sales_sales"/>
+            <field name="implied_ids" eval="[
+                (4, ref('group_custom_crm_salesperson')),
+                (4, ref('sales_team.group_sale_manager')),
+                (4, ref('stock.group_stock_manager')),
+                (4, ref('account.group_account_manager'))
+            ]"/>
+            <field name="comment">Manager avec accès complet au CRM et rapports</field>
+            <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
 
-    <record id="group_crm_client" model="res.groups">
-        <field name="name">CRM / Client</field>
-        <field name="category_id" ref="base.module_category_sales_sales"/>
-        <field name="implied_ids" eval="[(4, ref('base.group_portal'))]"/>
-        <field name="comment">Clients can view their own opportunities and submit feedback</field>
-    </record>
+        <!-- Portal Group Extension for Clients -->
+        <record id="group_custom_crm_client" model="res.groups">
+            <field name="name">CRM Avancé / Client Portal</field>
+            <field name="category_id" ref="base.module_category_sales_sales"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_portal'))]"/>
+            <field name="comment">Client avec accès limité au portail et feedback</field>
+        </record>
+    </data>
 
-    <!-- Record Rules -->
-    <record id="crm_rule_personal_lead" model="ir.rule">
-        <field name="name">Personal Leads</field>
-        <field name="model_id" ref="model_crm_lead"/>
-        <field name="domain_force">[('user_id','=',user.id)]</field>
-        <field name="groups" eval="[(4, ref('group_crm_salesperson'))]"/>
-    </record>
+    <!-- Règles de sécurité Record -->
+    <data noupdate="1">
+        <!-- Règle pour les vendeurs: accès à leurs propres opportunités -->
+        <record id="rule_crm_lead_salesperson" model="ir.rule">
+            <field name="name">Vendeur: Propres opportunités</field>
+            <field name="model_id" ref="crm.model_crm_lead"/>
+            <field name="domain_force">[('user_id','=',user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_custom_crm_salesperson'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
 
-    <record id="crm_rule_all_lead" model="ir.rule">
-        <field name="name">All Leads</field>
-        <field name="model_id" ref="model_crm_lead"/>
-        <field name="domain_force">[(1,'=',1)]</field>
-        <field name="groups" eval="[(4, ref('group_crm_manager'))]"/>
-    </record>
+        <!-- Règle pour les clients: accès à leurs propres données -->
+        <record id="rule_crm_lead_client" model="ir.rule">
+            <field name="name">Client: Propres opportunités</field>
+            <field name="model_id" ref="crm.model_crm_lead"/>
+            <field name="domain_force">[('partner_id.user_ids','in',[user.id])]</field>
+            <field name="groups" eval="[(4, ref('group_custom_crm_client'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Règle pour les managers: accès à toutes les opportunités -->
+        <record id="rule_crm_lead_manager" model="ir.rule">
+            <field name="name">Manager: Toutes les opportunités</field>
+            <field name="model_id" ref="crm.model_crm_lead"/>
+            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="groups" eval="[(4, ref('group_custom_crm_manager'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <!-- Règles pour les commandes de vente -->
+        <record id="rule_sale_order_salesperson" model="ir.rule">
+            <field name="name">Vendeur: Propres commandes</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="domain_force">[('user_id','=',user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_custom_crm_salesperson'))]"/>
+        </record>
+
+        <record id="rule_sale_order_client" model="ir.rule">
+            <field name="name">Client: Propres commandes</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="domain_force">[('partner_id.user_ids','in',[user.id])]</field>
+            <field name="groups" eval="[(4, ref('group_custom_crm_client'))]"/>
+        </record>
+
+        <record id="rule_sale_order_manager" model="ir.rule">
+            <field name="name">Manager: Toutes les commandes</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="groups" eval="[(4, ref('group_custom_crm_manager'))]"/>
+        </record>
+    </data>
 </odoo>
