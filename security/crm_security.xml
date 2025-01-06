@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="0">
-        <!-- Groupe Vendeur (Salesperson) -->
+
         <record id="group_custom_crm_salesperson" model="res.groups">
             <field name="name">CRM Avancé / Vendeur</field>
             <field name="category_id" ref="base.module_category_sales_sales"/>
@@ -13,7 +13,6 @@
             <field name="comment">Vendeur avec accès aux opportunités et clients</field>
         </record>
 
-        <!-- Groupe Manager -->
         <record id="group_custom_crm_manager" model="res.groups">
             <field name="name">CRM Avancé / Manager</field>
             <field name="category_id" ref="base.module_category_sales_sales"/>

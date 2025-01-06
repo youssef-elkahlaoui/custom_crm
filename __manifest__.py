@@ -32,6 +32,7 @@
         'wizards/lost_reason_views.xml',
         'data/mail_templates.xml',
         'data/cron_jobs.xml',
+        'views/dashboard_views.xml',
     ],
     'installable': True,
     'application': True,
