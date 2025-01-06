@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sale_order_base,sale.order.base,sale.model_sale_order,group_custom_crm_base,1,1,1,0
+access_sale_order_admin,sale.order.admin,sale.model_sale_order,group_custom_crm_admin,1,1,1,1
+access_sale_order_line_base,sale.order.line.base,sale.model_sale_order_line,group_custom_crm_base,1,1,1,0
+access_sale_order_line_admin,sale.order.line.admin,sale.model_sale_order_line,group_custom_crm_admin,1,1,1,1
+access_stock_picking_base,stock.picking.base,stock.model_stock_picking,group_custom_crm_base,1,1,1,0
+access_stock_picking_admin,stock.picking.admin,stock.model_stock_picking,group_custom_crm_admin,1,1,1,1
+access_stock_move_base,stock.move.base,stock.model_stock_move,group_custom_crm_base,1,1,1,0
+access_stock_move_admin,stock.move.admin,stock.model_stock_move,group_custom_crm_admin,1,1,1,1
+access_stock_move_line_base,stock.move.line.base,stock.model_stock_move_line,group_custom_crm_base,1,1,1,0
+access_stock_move_line_admin,stock.move.line.admin,stock.model_stock_move_line,group_custom_crm_admin,1,1,1,1
+access_crm_lost_reason_wizard_base,crm.lost.reason.wizard.base,model_crm_lost_reason_wizard,group_custom_crm_base,1,1,1,0
+access_crm_lost_reason_wizard_admin,crm.lost.reason.wizard.admin,model_crm_lost_reason_wizard,group_custom_crm_admin,1,1,1,1

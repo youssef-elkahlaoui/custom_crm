@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="email_template_opportunity_reminder" model="mail.template">
+        <field name="name">Opportunity Reminder</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="subject">Rappel concernant votre opportunité: ${object.name}</field>
+        <field name="email_from">${(user.email_formatted or user.company_id.email_formatted or '') | safe}</field>
+        <field name="email_to">${object.partner_id.email_formatted | safe}</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px;">
+                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                    Bonjour ${object.partner_id.name},<br/><br/>
+                    Nous souhaitons faire un suivi concernant l'opportunité "${object.name}".<br/><br/>
+                    Voici un récapitulatif :<br/>
+                    - Description: ${object.description}<br/>
+                    - Montant prévu: ${object.expected_revenue} ${object.company_currency}<br/>
+                    - État actuel: ${object.stage_id.name}<br/><br/>
+                    N'hésitez pas à nous contacter pour toute information complémentaire.<br/><br/>
+                    Cordialement,<br/>
+                    ${user.name}
+                </p>
+            </div>
+        </field>
+        <field name="lang">${object.partner_id.lang}</field>
+        <field name="auto_delete" eval="True"/>
+    </record>
+
+    <record id="email_template_feedback_request" model="mail.template">
+        <field name="name">Customer Feedback Request</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="subject">Votre avis nous intéresse - ${object.name}</field>
+        <field name="email_from">${(user.email_formatted or user.company_id.email_formatted or '') | safe}</field>
+        <field name="email_to">${object.partner_id.email_formatted | safe}</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px;">
+                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                    Bonjour ${object.partner_id.name},<br/><br/>
+                    Nous aimerions avoir votre retour sur notre collaboration concernant "${object.name}".<br/><br/>
+                    Merci de prendre quelques minutes pour répondre à notre questionnaire :<br/>
+                    <a href="/survey/start/${object.feedback_survey_id.access_token}" style="background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;">
+                        Répondre au questionnaire
+                    </a><br/><br/>
+                    Votre avis est important pour nous aider à améliorer nos services.<br/><br/>
+                    Cordialement,<br/>
+                    ${user.name}
+                </p>
+            </div>
+        </field>
+        <field name="lang">${object.partner_id.lang}</field>
+        <field name="auto_delete" eval="True"/>
+    </record>
+</odoo>

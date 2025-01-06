@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vue formulaire héritée -->
+    <record id="view_partner_form_inherit_custom_crm" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.custom.crm</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <!-- Ajout des champs dans l'onglet Ventes & Achats -->
+            <xpath expr="//page[@name='sales_purchases']" position="inside">
+                <group name="custom_crm" string="Informations CRM">
+                    <group>
+                        <field name="client_type"/>
+                        <field name="total_purchases"/>
+                        <field name="client_rating" widget="priority"/>
+                        <field name="contact_method"/>
+                    </group>
+                    <group>
+                        <field name="last_contact"/>
+                        <field name="next_contact"/>
+                        <field name="client_notes"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Vue liste héritée -->
+    <record id="view_partner_tree_inherit_custom_crm" model="ir.ui.view">
+        <field name="name">res.partner.tree.inherit.custom.crm</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <field name="phone" position="after">
+                <field name="client_type"/>
+                <field name="client_rating" widget="priority"/>
+                <field name="total_purchases"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Vue recherche héritée -->
+    <record id="view_res_partner_filter_inherit_custom_crm" model="ir.ui.view">
+        <field name="name">res.partner.select.inherit.custom.crm</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <field name="client_type"/>
+                <field name="client_rating"/>
+                <group expand="0" string="Group By">
+                    <filter string="Type de client" name="client_type" context="{'group_by': 'client_type'}"/>
+                    <filter string="Note client" name="client_rating" context="{'group_by': 'client_rating'}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Action de menu -->
+    <record id="action_custom_crm_customers" model="ir.actions.act_window">
+        <field name="name">Clients</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{'default_customer_rank': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer un nouveau client
+            </p>
+        </field>
+    </record>
+
+    <!-- Élément de menu -->
+    <menuitem 
+        id="menu_custom_crm_customers"
+        name="Clients"
+        parent="menu_custom_crm_root"
+        action="action_custom_crm_customers"
+        sequence="15"/>
+</odoo>

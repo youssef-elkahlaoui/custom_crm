@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Template pour les rappels -->
+    <record id="email_template_opportunity_reminder" model="mail.template">
+        <field name="name">Rappel Opportunité</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="subject">Rappel: Suivi de l'opportunité ${object.name}</field>
+        <field name="email_from">${user.email_formatted | safe}</field>
+        <field name="partner_to">${object.partner_id.id}</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px;">
+                <p>Bonjour ${object.partner_id.name},</p>
+                <p>Nous souhaitons faire un suivi concernant l'opportunité "${object.name}".</p>
+                <p>Pouvez-vous nous donner vos retours ?</p>
+                <br/>
+                <p>Cordialement,</p>
+                <p>${user.signature | safe}</p>
+            </div>
+        </field>
+    </record>
+
+    <!-- Template pour l'archivage -->
+    <record id="email_template_opportunity_archived" model="mail.template">
+        <field name="name">Opportunité Archivée</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="subject">Opportunité ${object.name} archivée</field>
+        <field name="email_from">${user.email_formatted | safe}</field>
+        <field name="email_to">${object.user_id.email_formatted | safe}</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px;">
+                <p>L'opportunité "${object.name}" a été archivée automatiquement après 30 jours sans feedback.</p>
+                <br/>
+                <p>Cordialement,</p>
+                <p>${user.signature | safe}</p>
+            </div>
+        </field>
+    </record>
+
+    <!-- Template pour notification de gain -->
+    <record id="email_template_opportunity_won" model="mail.template">
+        <field name="name">Opportunité Gagnée - Création Sales Order</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="subject">Nouvelle opportunité gagnée: ${object.name}</field>
+        <field name="email_from">${user.email_formatted | safe}</field>
+        <field name="email_to">${user.company_id.partner_id.email_formatted | safe}</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px;">
+                <p>Bonjour,</p>
+                <p>L'opportunité "${object.name}" a été gagnée.</p>
+                <p>Merci de créer un bon de commande pour le client ${object.partner_id.name}.</p>
+                <br/>
+                <p>Cordialement,</p>
+                <p>${user.signature | safe}</p>
+            </div>
+        </field>
+    </record>
+</odoo>

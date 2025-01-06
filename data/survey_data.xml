@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="default_feedback_survey" model="survey.survey">
+        <field name="title">Questionnaire de satisfaction client</field>
+        <field name="access_token">feedback_satisfaction_client</field>
+        <field name="access_mode">public</field>
+        <field name="users_can_go_back" eval="True"/>
+        <field name="questions_layout">page_per_section</field>
+    </record>
+
+    <record id="feedback_section_general" model="survey.question">
+        <field name="title">Évaluation générale</field>
+        <field name="survey_id" ref="default_feedback_survey"/>
+        <field name="sequence">1</field>
+        <field name="is_page" eval="True"/>
+    </record>
+
+    <record id="question_satisfaction" model="survey.question">
+        <field name="title">Quel est votre niveau de satisfaction global ?</field>
+        <field name="survey_id" ref="default_feedback_survey"/>
+        <field name="sequence">2</field>
+        <field name="question_type">matrix</field>
+        <field name="matrix_subtype">simple</field>
+        <field name="constr_mandatory" eval="True"/>
+        <field name="comments_allowed" eval="True"/>
+        <field name="comments_message">Commentaires additionnels</field>
+    </record>
+
+    <record id="answer_very_satisfied" model="survey.question.answer">
+        <field name="value">Très satisfait</field>
+        <field name="answer_score">5.0</field>
+        <field name="question_id" ref="question_satisfaction"/>
+    </record>
+
+    <record id="answer_satisfied" model="survey.question.answer">
+        <field name="value">Satisfait</field>
+        <field name="answer_score">4.0</field>
+        <field name="question_id" ref="question_satisfaction"/>
+    </record>
+
+    <record id="answer_neutral" model="survey.question.answer">
+        <field name="value">Neutre</field>
+        <field name="answer_score">3.0</field>
+        <field name="question_id" ref="question_satisfaction"/>
+    </record>
+
+    <record id="answer_dissatisfied" model="survey.question.answer">
+        <field name="value">Insatisfait</field>
+        <field name="answer_score">2.0</field>
+        <field name="question_id" ref="question_satisfaction"/>
+    </record>
+
+    <record id="answer_very_dissatisfied" model="survey.question.answer">
+        <field name="value">Très insatisfait</field>
+        <field name="answer_score">1.0</field>
+        <field name="question_id" ref="question_satisfaction"/>
+    </record>
+</odoo>

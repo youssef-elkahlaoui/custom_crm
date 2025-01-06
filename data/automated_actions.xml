@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Email Server Action -->
+    <record id="action_send_reminder_email" model="ir.actions.server">
+        <field name="name">Send Reminder Email</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    for record in records:
+        template = env.ref('custom_crm.email_template_opportunity_reminder')
+        template.send_mail(record.id, force_send=True)
+        </field>
+    </record>
+
+    <!-- 7 Days Reminder -->
+    <record id="automation_reminder_7_days" model="base.automation">
+        <field name="name">Send Reminder After 7 Days</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="trigger">on_time</field>
+        <field name="filter_domain">[('type', '=', 'opportunity')]</field>
+        <field name="state">code</field>
+        <field name="code">
+template = env.ref('custom_crm.email_template_opportunity_reminder')
+for record in records:
+    if (datetime.now() - record.create_date).days == 7:
+        template.send_mail(record.id, force_send=True)
+        </field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <!-- 15 Days Reminder -->
+    <record id="automation_reminder_15_days" model="base.automation">
+        <field name="name">Send Reminder After 15 Days</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="trigger">on_time</field>
+        <field name="filter_domain">[('type', '=', 'opportunity')]</field>
+        <field name="state">code</field>
+        <field name="code">
+template = env.ref('custom_crm.email_template_opportunity_reminder')
+for record in records:
+    if (datetime.now() - record.create_date).days == 15:
+        template.send_mail(record.id, force_send=True)
+        </field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <!-- 30 Days Reminder and Archive -->
+    <record id="automation_reminder_and_archive_30_days" model="base.automation">
+        <field name="name">Send Reminder and Archive After 30 Days</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="trigger">on_time</field>
+        <field name="filter_domain">[('type', '=', 'opportunity'), ('active', '=', True)]</field>
+        <field name="state">code</field>
+        <field name="code">
+template = env.ref('custom_crm.email_template_opportunity_reminder')
+for record in records:
+    if (datetime.now() - record.create_date).days == 30:
+        template.send_mail(record.id, force_send=True)
+        record.write({'active': False})
+        </field>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>
